@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>com.tutorial.microservice</groupId>
+        <artifactId>microservice</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <!--  ====================================================================================================  -->
+    <!--                                                 PROJECT                                                -->
+    <!--  ====================================================================================================  -->
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.tutorial.rest</groupId>
+    <artifactId>rest</artifactId>
+    <version>${env.REST_VERSION}</version>
+
+    <!--  ====================================================================================================  -->
+    <!--                                                PROPERTIES                                              -->
+    <!--  ====================================================================================================  -->
+
+    <properties>
+        <app.package.jooq>com.tutorial.rest.jooq</app.package.jooq>
+        <app.folder.java>src/main/java</app.folder.java>
+
+        <postgres.driver.version>9.4.1212</postgres.driver.version>
+
+        <springfox.version>2.7.0</springfox.version>
+
+        <jooq.version>3.9.1</jooq.version>
+
+        <lombok.version>1.16.16</lombok.version>
+
+        <flyway.version>4.2.0</flyway.version>
+
+        <dockerfile.version>1.3.1</dockerfile.version>
+
+    </properties>
+
+    <!--  ====================================================================================================  -->
+    <!--                                              DEPENDENCIES                                              -->
+    <!--  ====================================================================================================  -->
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>Camden.SR7</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-config</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jooq</artifactId>
+        </dependency>
+        <!--<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>-->
+
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>${springfox.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>${springfox.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${postgres.driver.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+    </dependencies>
+
+    <!--  ====================================================================================================  -->
+    <!--                                              PLUGINS                                                   -->
+    <!--  ====================================================================================================  -->
+
+    <build>
+        <!--
+        exclude version from the final jar
+        version is tracked by docker image version, it's not necessary for jar to contain version
+         -->
+        <finalName>${project.artifactId}</finalName>
+
+        <plugins>
+            <!-- Maven jar plugin and dependencies plugin to package jar file and its dependencies in lib folder -->
+
+            <!--This will produce a MANIFEST.MF with the following entries
+            ...
+            Main-Class: fully.qualified.MainClass
+            Class-Path: lib/dependency1-X.Y.jar lib/dependency2-W.Z.jar
+            ...-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.0.2</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <mainClass>com.tutorial.rest.Application</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <!-- Copy project's dependencies to target/lib folder -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.0.1</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--  =================================================================================================  -->
+
+            <!--  Jayway Database versioning tool -->
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>${flyway.version}</version>
+                <!-- Note that we're executing the Flyway
+                plugin in the "generate-sources" phase -->
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>migrate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <sqlMigrationSeparator>__</sqlMigrationSeparator>
+                    <locations>
+                        <location>filesystem:src/main/resources/flyway/migrations</location>
+                    </locations>
+                    <url>${database.url}</url>
+                    <user>${database.user}</user>
+                    <password>${databese.password}</password>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.postgresql</groupId>
+                        <artifactId>postgresql</artifactId>
+                        <version>${postgres.driver.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+            <!--  =================================================================================================  -->
+
+            <!--  JOOQ Code Gen -->
+            <plugin>
+                <groupId>org.jooq</groupId>
+                <artifactId>jooq-codegen-maven</artifactId>
+                <version>${jooq.version}</version>
+
+                <!-- The jOOQ code generation plugin is also
+                executed in the generate-sources phase,
+                prior to compilation -->
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+
+                <!-- Manage the plugin's dependency. we PostgreSQL database -->
+                <dependencies>
+                    <dependency>
+                        <groupId>org.postgresql</groupId>
+                        <artifactId>postgresql</artifactId>
+                        <version>${postgres.driver.version}</version>
+                    </dependency>
+                </dependencies>
+
+                <!-- Specify the plugin configuration.
+                     The configuration format is the same as for the standalone code generator -->
+                <configuration>
+
+                    <!-- JDBC connection parameters -->
+                    <jdbc>
+                        <url>${database.url}</url>
+                        <user>${database.user}</user>
+                        <password>${databese.password}</password>
+                    </jdbc>
+
+                    <!-- Generator parameters -->
+                    <generator>
+                        <database>
+                            <name>org.jooq.util.postgres.PostgresDatabase</name>
+                            <includes>.*</includes>
+                            <excludes></excludes>
+                            <!-- In case your database supports catalogs, e.g. SQL Server:
+                            <inputCatalog>public</inputCatalog>
+                              -->
+                            <inputSchema>public</inputSchema>
+                        </database>
+                        <target>
+                            <packageName>${app.package.jooq}</packageName>
+                            <directory>${app.folder.java}</directory>
+                        </target>
+                        <generate>
+                            <daos>true</daos>
+                        </generate>
+                    </generator>
+                </configuration>
+            </plugin>
+
+            <!--  =================================================================================================  -->
+
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>dockerfile-maven-plugin</artifactId>
+                <version>${dockerfile.version}</version>
+                <executions>
+                    <execution>
+                        <id>default</id>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <repository>tutorial/${project.artifactId}</repository>
+                    <tag>${project.version}</tag>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <!--  ====================================================================================================  -->
+    <!--                                              PROFILES                                                  -->
+    <!--  ====================================================================================================  -->
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <database.url>jdbc:postgresql://localhost:5432/rest_tutorial</database.url>
+                <database.user>postgres</database.user>
+                <databese.password>root</databese.password>
+            </properties>
+        </profile>
+        <profile>
+            <id>container</id>
+            <properties>
+                <database.url>jdbc:postgresql://${env.DB_HOST}:${env.DB_PORT}/${env.POSTGRES_DB}</database.url>
+                <database.user>${env.POSTGRES_USER}</database.user>
+                <databese.password>${env.POSTGRES_PASSWORD}</databese.password>
+            </properties>
+        </profile>
+    </profiles>
+
+</project>

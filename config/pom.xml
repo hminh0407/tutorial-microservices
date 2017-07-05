@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>com.tutorial.microservice</groupId>
+        <artifactId>microservice</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.tutorial.config</groupId>
+    <artifactId>config</artifactId>
+    <version>${env.CONFIG_VERSION}</version>
+
+    <!--  ====================================================================================================  -->
+    <!--                                                PROPERTIES                                              -->
+    <!--  ====================================================================================================  -->
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.8</java.version>
+
+        <dockerfile.version>1.3.1</dockerfile.version>
+    </properties>
+
+    <!--  ====================================================================================================  -->
+    <!--                                              DEPENDENCIES                                              -->
+    <!--  ====================================================================================================  -->
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>Camden.SR7</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-config-server</artifactId>
+        </dependency>
+    </dependencies>
+
+    <!--  ====================================================================================================  -->
+    <!--                                              PLUGINS                                                   -->
+    <!--  ====================================================================================================  -->
+
+    <build>
+        <!--
+        exclude version from the final jar
+        version is tracked by docker image version, it's not necessary for jar to contain version
+         -->
+        <finalName>${project.artifactId}</finalName>
+
+        <plugins>
+            <!--  =================================================================================================  -->
+
+            <!-- Maven jar plugin and dependencies plugin to package jar file and its dependencies in lib folder -->
+
+            <!--This will produce a MANIFEST.MF with the following entries
+            ...
+            Main-Class: fully.qualified.MainClass
+            Class-Path: lib/dependency1-X.Y.jar lib/dependency2-W.Z.jar
+            ...-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.0.2</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <mainClass>com.tutorial.${project.artifactId}.Application</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <!-- Copy project's dependencies to target/lib folder -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.0.1</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--  =================================================================================================  -->
+
+            <!-- Build docker image on re-package phrase -->
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>dockerfile-maven-plugin</artifactId>
+                <version>${dockerfile.version}</version>
+                <executions>
+                    <execution>
+                        <id>default</id>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <repository>tutorial/${project.artifactId}</repository>
+                    <tag>${project.version}</tag>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

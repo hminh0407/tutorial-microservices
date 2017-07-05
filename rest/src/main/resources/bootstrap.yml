@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: rest
+  cloud:
+    config:
+      uri: http://config:8888
+      fail-fast: true
+      username: config
+      password: ${CONFIG_SERVICE_PASSWORD}

@@ -1,0 +1,21 @@
+management:
+  security:
+    enabled: false
+
+spring:
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: classpath:/shared
+  profiles:
+    # File System: https://bushkarl.gitbooks.io/spring-cloud/content/spring_cloud_config/spring_cloud_config_server.html
+     active: native
+
+server:
+  port: 8888
+
+security:
+  user:
+    name: config
+    password: ${CONFIG_SERVICE_PASSWORD}

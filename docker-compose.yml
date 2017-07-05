@@ -1,0 +1,33 @@
+version: '3.2'
+services:
+  postgres:
+    image: postgres:${POSTGRES_VERSION}
+    ports:
+      - 5432:5432
+    volumes:
+      - rest_postgres_dbstore:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
+  config:
+      image: tutorial/config:${CONFIG_VERSION}
+      ports:
+        - 8888:8888
+      environment:
+        - POSTGRES_USER
+        - POSTGRES_PASSWORD
+        - POSTGRES_DB
+        - CONFIG_SERVICE_PASSWORD
+  rest:
+      image: tutorial/rest:${REST_VERSION}
+      ports:
+        - 8100:8100
+      depends_on:
+        - postgres
+        - config
+      environment:
+        - CONFIG_SERVICE_PASSWORD
+      restart: always
+volumes:
+  rest_postgres_dbstore:

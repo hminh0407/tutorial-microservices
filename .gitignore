@@ -1,0 +1,4 @@
+.idea/
+*.iml
+/home/minh/Dropbox/workspace/tutorial/MicroServiceTutorial/rest/src/main/java/com/tutorial/rest/jooq
+target/
