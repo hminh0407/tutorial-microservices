@@ -1,9 +1,6 @@
 server:
   port: 8100
-
-management:
-  security:
-    enabled: false
+  context-path: /rest
 
 spring:
   profiles:

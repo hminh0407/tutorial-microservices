@@ -9,45 +9,26 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>registry</artifactId>
-    <groupId>com.tutorial.registry</groupId>
-    <version>${env.REGISTRY_VERSION}</version>
-
-    <!--  ====================================================================================================  -->
-    <!--                                                PROPERTIES                                              -->
-    <!--  ====================================================================================================  -->
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>1.8</java.version>
-
-        <dockerfile.version>1.3.1</dockerfile.version>
-    </properties>
+    <artifactId>gateway</artifactId>
+    <groupId>com.tutorial.gateway</groupId>
+    <version>${env.GATEWAY_VERSION}</version>
 
     <!--  ====================================================================================================  -->
     <!--                                              DEPENDENCIES                                              -->
     <!--  ====================================================================================================  -->
 
-    <!--<dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>Camden.SR7</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>-->
-
     <dependencies>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-config</artifactId>
+            <artifactId>spring-cloud-starter-eureka</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-eureka-server</artifactId>
+            <artifactId>spring-cloud-starter-zuul</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-config</artifactId>
         </dependency>
     </dependencies>
 

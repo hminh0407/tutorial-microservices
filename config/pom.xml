@@ -28,7 +28,7 @@
     <!--                                              DEPENDENCIES                                              -->
     <!--  ====================================================================================================  -->
 
-    <dependencyManagement>
+    <!--<dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
@@ -38,7 +38,7 @@
                 <scope>import</scope>
             </dependency>
         </dependencies>
-    </dependencyManagement>
+    </dependencyManagement>-->
 
     <dependencies>
         <dependency>
@@ -59,72 +59,20 @@
         <finalName>${project.artifactId}</finalName>
 
         <plugins>
-            <!--  =================================================================================================  -->
-
-            <!-- Maven jar plugin and dependencies plugin to package jar file and its dependencies in lib folder -->
-
-            <!--This will produce a MANIFEST.MF with the following entries
-            ...
-            Main-Class: fully.qualified.MainClass
-            Class-Path: lib/dependency1-X.Y.jar lib/dependency2-W.Z.jar
-            ...-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.0.2</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>com.tutorial.${project.artifactId}.Application</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
             </plugin>
-            <!-- Copy project's dependencies to target/lib folder -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.0.1</version>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                            <overWriteReleases>false</overWriteReleases>
-                            <overWriteSnapshots>false</overWriteSnapshots>
-                            <overWriteIfNewer>true</overWriteIfNewer>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
-
-            <!--  =================================================================================================  -->
-
-            <!-- Build docker image on re-package phrase -->
             <plugin>
                 <groupId>com.spotify</groupId>
                 <artifactId>dockerfile-maven-plugin</artifactId>
-                <version>${dockerfile.version}</version>
-                <executions>
-                    <execution>
-                        <id>default</id>
-                        <goals>
-                            <goal>build</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <repository>tutorial/${project.artifactId}</repository>
-                    <tag>${project.version}</tag>
-                </configuration>
             </plugin>
         </plugins>
+
     </build>
 
 </project>

@@ -2,3 +2,9 @@
 *.iml
 /home/minh/Dropbox/workspace/tutorial/MicroServiceTutorial/rest/src/main/java/com/tutorial/rest/jooq
 target/
+
+# ignore symlink files
+config/mvn_util.sh
+registry/mvn_util.sh
+gateway/mvn_util.sh
+rest/mvn_util.sh

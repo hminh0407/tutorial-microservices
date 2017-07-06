@@ -19,13 +19,33 @@ services:
         - POSTGRES_PASSWORD
         - POSTGRES_DB
         - CONFIG_SERVICE_PASSWORD
+  registry:
+      image: tutorial/registry:${CONFIG_VERSION}
+      ports:
+        - 8761:8761
+      depends_on:
+        - config
+      environment:
+        - CONFIG_SERVICE_PASSWORD
+      restart: always
+  gateway:
+      image: tutorial/gateway:${GATEWAY_VERSION}
+      ports:
+        - 4000:4000
+      depends_on:
+        - config
+      environment:
+        - CONFIG_SERVICE_PASSWORD
+      restart: always
   rest:
       image: tutorial/rest:${REST_VERSION}
-      ports:
-        - 8100:8100
+      # ports:
+      #  - 8100:8100
       depends_on:
         - postgres
         - config
+        - registry
+        - gateway
       environment:
         - CONFIG_SERVICE_PASSWORD
       restart: always

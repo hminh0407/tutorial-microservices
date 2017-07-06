@@ -5,17 +5,23 @@
 
 export POSTGRES_VERSION=9.6.3-alpine
 export CONFIG_VERSION=1.0
+export REGISTRY_VERSION=1.0
+export GATEWAY_VERSION=1.0
 export REST_VERSION=1.0
 
 declare CONTEXT=$(pwd)
 declare COMMAND=$1
 
 ln -s ${CONTEXT}/config/script/* ${CONTEXT}/config
+ln -s ${CONTEXT}/registry/script/* ${CONTEXT}/registry
+ln -s ${CONTEXT}/gateway/script/* ${CONTEXT}/gateway
 ln -s ${CONTEXT}/rest/script/* ${CONTEXT}/rest
 
 build_all() {
     # https://stackoverflow.com/questions/8818119/how-can-i-run-a-function-from-a-script-in-command-line
     (cd ${CONTEXT}/config; . ./mvn_util.sh && package ${CONFIG_VERSION})
+    (cd ${CONTEXT}/registry; . ./mvn_util.sh && package ${REGISTRY_VERSION})
+    (cd ${CONTEXT}/gateway; . ./mvn_util.sh && package ${GATEWAY_VERSION})
     (cd ${CONTEXT}/rest; . ./mvn_util.sh && package ${REST_VERSION})
 }
 
@@ -36,24 +42,9 @@ clean_all() {
 }
 
 build() {
-    (cd ${CONTEXT}/$1; . ./mvn_util.sh && package $2)
+    (cd ${CONTEXT}/$1; . ./mvn_util.sh && package ${2:-1.0})
 }
 
 clean() {
     docker rm -fv $(docker ps -a | awk ' /'microservicetutorial_$1'/ {print $1} ')
 }
-
-#if [ ${COMMAND} == 'build_all' ]; then
-#    build_all
-#elif [ ${COMMAND} == 'run_all' ]; then
-#    run_all
-#elif [ ${COMMAND} == 'build' ]; then
-#    if [ $# -ne 3  ]; then
-#        echo 'must pass service name and version'
-#        exit
-#    else
-#        build $1 $2
-#    fi
-#else
-#    echo 'supported command are: run_all'
-#fi
