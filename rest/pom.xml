@@ -285,7 +285,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <database.url>jdbc:postgresql://localhost:5432/rest_tutorial</database.url>
+                <database.url>jdbc:postgresql://localhost:5432/platform4svvn</database.url>
                 <database.user>postgres</database.user>
                 <databese.password>root</databese.password>
             </properties>

@@ -1,16 +1,7 @@
 management:
   security:
-    enabled: false
-
-spring:
-  cloud:
-    config:
-      server:
-        native:
-          search-locations: classpath:/shared
-  profiles:
-    # File System: https://bushkarl.gitbooks.io/spring-cloud/content/spring_cloud_config/spring_cloud_config_server.html
-     active: native
+    enabled: true
+    roles: ACTRADMIN
 
 server:
   port: 8888
@@ -19,3 +10,29 @@ security:
   user:
     name: config
     password: ${CONFIG_SERVICE_PASSWORD}
+
+spring:
+  profiles:
+    active: "native"
+
+---
+
+spring:
+  # File System: https://bushkarl.gitbooks.io/spring-cloud/content/spring_cloud_config/spring_cloud_config_server.html
+  profiles: native
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: file://${CONFIG_SERVICE_LOCATION}
+          #search-locations: classpath:/shared
+
+---
+
+spring:
+  profiles: container
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/hminh0407/tutorial-microservices-config-repo

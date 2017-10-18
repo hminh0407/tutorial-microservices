@@ -1,0 +1,11 @@
+server:
+  port: 8200
+  context-path: /rest
+
+spring:
+  main:
+    banner-mode: "off"
+  datasource:
+      url: jdbc:postgresql://localhost:5432/rest_db
+      username: postgres
+      password: root

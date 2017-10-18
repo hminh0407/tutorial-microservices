@@ -19,6 +19,9 @@ services:
         - POSTGRES_PASSWORD
         - POSTGRES_DB
         - CONFIG_SERVICE_PASSWORD
+        - CONFIG_SERVICE_LOCATION
+      volumes:
+        - ./config/tutorial-microservices-config-repo:/usr/share/config/repo
   registry:
       image: tutorial/registry:${CONFIG_VERSION}
       ports:
@@ -31,7 +34,7 @@ services:
   gateway:
       image: tutorial/gateway:${GATEWAY_VERSION}
       ports:
-        - 4000:4000
+        - 4000:4000z
       depends_on:
         - config
       environment:
@@ -39,8 +42,8 @@ services:
       restart: always
   rest:
       image: tutorial/rest:${REST_VERSION}
-      # ports:
-      #  - 8100:8100
+      ports:
+       - 8100:8100
       depends_on:
         - postgres
         - config

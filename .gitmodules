@@ -1,0 +1,3 @@
+[submodule "tutorial-microservices-config-repo"]
+	path = tutorial-microservices-config-repo
+	url = git@github.com:hminh0407/tutorial-microservices-config-repo.git

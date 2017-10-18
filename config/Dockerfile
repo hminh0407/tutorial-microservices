@@ -8,3 +8,4 @@ ADD target/config.jar /usr/share/config/config.jar
 WORKDIR /usr/share/config
 
 ENTRYPOINT ["/usr/bin/java", "-jar", "-Dspring.profiles.active=native", "config.jar"]
+#ENTRYPOINT ["/usr/bin/java", "-jar", "-Dspring.profiles.active=container", "config.jar"]

@@ -1,0 +1,26 @@
+server:
+  port: 4000
+
+zuul:
+  ignoredServices: '*'
+  host:
+    connect-timeout-millis: 30000
+    socket-timeout-millis: 30000
+  routes:
+    auth-service:
+      path: /rest/**
+      serviceId: rest
+      stripPrefix: false
+      sensitiveHeaders:
+
+ribbon:
+  ReadTimeout: 30000
+  ConnectTimeout: 30000
+
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 20000

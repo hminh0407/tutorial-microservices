@@ -1,0 +1,27 @@
+server:
+  port: 8100
+  context-path: /rest
+
+spring:
+  profiles:
+    active: "dev"
+  main:
+    banner-mode: "off"
+
+---
+
+spring:
+  profiles: dev
+  datasource:
+    url: jdbc:postgresql://localhost:5432/rest_db
+    username: postgres
+    password: root
+
+---
+
+spring:
+  profiles: container
+  datasource:
+      url: jdbc:postgresql://postgres:5432/rest_db
+      username: postgres
+      password: root
